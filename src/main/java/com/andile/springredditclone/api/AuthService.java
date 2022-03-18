@@ -1,8 +1,11 @@
 package com.andile.springredditclone.api;
 
+import com.andile.springredditclone.api.dto.AuthenticationResponse;
+import com.andile.springredditclone.api.dto.LoginRequest;
 import com.andile.springredditclone.api.dto.RegisterRequest;
 import com.andile.springredditclone.exception.SpringRedditException;
 import com.andile.springredditclone.api.service.MailService;
+import com.andile.springredditclone.infrastructure.JwtProvider;
 import com.andile.springredditclone.persistance.UserRepository;
 import com.andile.springredditclone.persistance.VerificationTokenRepository;
 import com.andile.springredditclone.persistance.model.NotificationEmail;
@@ -10,14 +13,17 @@ import com.andile.springredditclone.persistance.model.User;
 import com.andile.springredditclone.persistance.model.VerificationToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.Authenticator;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
-
 import static com.andile.springredditclone.util.Constants.ACTIVATION_EMAIL;
 
 @Service
@@ -30,7 +36,8 @@ public class AuthService {
     private final VerificationTokenRepository verificationTokenRepository;
     private final MailContentBuilder mailContentBuilder;
     private final MailService mailService;
-
+    private final AuthenticationManager authenticationManager;
+    private final JwtProvider jwtProvider;
     /**
      * @param registerRequest
      */
@@ -92,5 +99,13 @@ public class AuthService {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new SpringRedditException("User Not Found with id - " + username));
         user.setEnabled(true);
         userRepository.save(user);
+    }
+
+    public AuthenticationResponse login(LoginRequest loginRequest) {
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+                loginRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        String authenticationToken = jwtProvider.generateToken(authenticate);
+        return new AuthenticationResponse(authenticationToken, loginRequest.getUsername());
     }
 }
