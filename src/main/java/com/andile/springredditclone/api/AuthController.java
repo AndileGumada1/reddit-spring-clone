@@ -3,10 +3,12 @@ package com.andile.springredditclone.api;
 import com.andile.springredditclone.api.dto.AuthenticationResponse;
 import com.andile.springredditclone.api.dto.LoginRequest;
 import com.andile.springredditclone.api.dto.RegisterRequest;
+import com.andile.springredditclone.api.service.AuthService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +18,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Log4j2
+@Slf4j
 public class AuthController {
     private final AuthService authService;
     final ObjectMapper objectMapper;
@@ -28,15 +30,16 @@ public class AuthController {
      * @throws JsonProcessingException
      */
     @PostMapping(value = "/signup",consumes = "application/json")
-    public ResponseEntity signup(@RequestBody RegisterRequest registerRequest) throws JsonProcessingException {
+    public ResponseEntity<?> signup(@RequestBody RegisterRequest registerRequest) throws JsonProcessingException {
         log.info("Request: {}", objectMapper.writeValueAsString(registerRequest));
         authService.signUp(registerRequest);
         return new ResponseEntity(OK);
     }
 
     /**
-     * @param loginRequest
-     * @return
+     * End-point used for logging in by the user
+     * @param loginRequest represents the login request to be sent
+     * @return AuthenticationResponse object
      * @throws JsonProcessingException
      */
     @PostMapping("/login")
@@ -44,8 +47,8 @@ public class AuthController {
         log.info("Login Request: {}",objectMapper.writeValueAsString(loginRequest));
         return authService.login(loginRequest);
     }
-    /**
-     * @param token
+    /** End-point used to verify the account of the user
+     * @param token represents the token to be sent to the user for verification
      * @return ResponseEntity
      */
     @GetMapping("accountVerification/{token}")

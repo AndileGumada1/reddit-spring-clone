@@ -1,6 +1,5 @@
 package com.andile.springredditclone.api.service;
 
-import com.andile.springredditclone.api.MailContentBuilder;
 import com.andile.springredditclone.exception.SpringRedditException;
 import com.andile.springredditclone.persistance.model.NotificationEmail;
 import lombok.AllArgsConstructor;
