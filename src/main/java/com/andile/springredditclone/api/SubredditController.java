@@ -24,7 +24,6 @@ public class SubredditController {
      */
     @GetMapping
     public ResponseEntity<List<SubredditDto>> getAllSubreddits() {
-        
        List<SubredditDto> list =subredditService.getAll();
        log.info("Request of list Subreddit :{}",list);
        
@@ -38,8 +37,7 @@ public class SubredditController {
     @GetMapping("/{id}")
     public SubredditDto getSubreddit(@PathVariable Long id) {
         log.info("get Subreddit: {}",id);
-        return 
-        		subredditService.getSubreddit(id);
+        return subredditService.getSubreddit(id);
     }
 
     /**

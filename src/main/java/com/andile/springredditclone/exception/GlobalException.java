@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @ControllerAdvice
@@ -22,7 +24,7 @@ public class GlobalException {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -33,7 +35,12 @@ public class GlobalException {
      */
     @ExceptionHandler(SpringRedditException.class)
     public ResponseEntity<?> resourceNotFoundException(SpringRedditException ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<?> postNotFoundException(PostNotFoundException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
     @Data
@@ -41,7 +48,7 @@ public class GlobalException {
     @AllArgsConstructor
     @NoArgsConstructor
     public final static class ErrorDetails{
-        private Date timestamp;
+        private LocalDateTime timestamp;
         private String details;
         private String message;
 

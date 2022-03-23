@@ -24,7 +24,7 @@ public class AuthController {
     final ObjectMapper objectMapper;
 
     /**
-     * End-point for registering a user
+     * End-point for registering a new user
      * @param registerRequest payload
      * @return ResponseEntity object
      * @throws JsonProcessingException
